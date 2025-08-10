@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Крестики-нолики</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #1a2a4a, #2a4a7a, #3a6a9a, #2a4a7a);
+      background-size: 800% 800%;
+      animation: gradientShift 20s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #e0e0e0;
+      overflow: hidden;
+      transition: all 0.8s ease;
+    }
+
+    body.light-theme {
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb, #ffd89b, #ffecd2);
+      background-size: 800% 800%;
+      animation: gradientShift 25s ease infinite;
+      color: #333;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      25% { background-position: 50% 100%; }
+      50% { background-position: 100% 50%; }
+      75% { background-position: 50% 0%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      max-width: 540px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      transition: all 0.8s ease;
+    }
+
+    body.light-theme .container {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #333;
+    }
+
+    h1 {
+      font-size: 2.7em;
+      margin-bottom: 20px;
+      color: #e0e0e0;
+      text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+      transition: all 0.8s ease;
+    }
+
+    body.light-theme h1 {
+      color: #333;
+      text-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    input {
+      padding: 12px 20px;
+      margin: 10px 0;
+      width: 80%;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #e0e0e0;
+      font-size: 16px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.8s ease;
+    }
+
+    body.light-theme input {
+      background: rgba(255, 255, 255, 0.3);
+      color: #333;
+    }
+
+    input::placeholder {
+      color: rgba(224, 224, 224, 0.7);
+      transition: all 0.8s ease;
+    }
+
+    body.light-theme input::placeholder {
+      color: rgba(51, 51, 51, 0.7);
+    }
+
+    button {
+      padding: 12px 24px;
+      margin: 10px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #e0e0e0;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    body.light-theme button {
+      background: rgba(255, 255, 255, 0.3);
+      color: #333;
+    }
+
+    button:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    body.light-theme button:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    button:active {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    button.success {
+      background: rgba(46, 204, 113, 0.25);
+    }
+
+    body.light-theme button.success {
+      background: rgba(46, 204, 113, 0.35);
+      color: #333;
+    }
+
+    button.danger {
+      background: rgba(231, 76, 60, 0.25);
+    }
+
+    body.light-theme button.danger {
+      background: rgba(231, 76, 60, 0.35);
+      color: #333;
+    }
+
+    button:hover.success {
+      background: rgba(46, 204, 113, 0.35);
+    }
+
+    body.light-theme button:hover.success {
+      background: rgba(46, 204, 113, 0.45);
+    }
+
+    button:hover.danger {
+      background: rgba(231, 76, 60, 0.35);
+    }
+
+    body.light-theme button:hover.danger {
+      background: rgba(231, 76, 60, 0.45);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 25px auto;
+      max-width: 330px;
+    }
+
+    .cell {
+      width: 95px;
+      height: 95px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 42px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 14px;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    }
+
+    body.light-theme .cell {
+      background: rgba(255, 255, 255, 0.25);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .cell:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    body.light-theme .cell:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .cell.x {
+      color: #ffa726;
+    }
+
+    .cell.o {
+      color: #64b5f6;
+    }
+
+    .cell.highlight {
+      background: rgba(255, 223, 0, 0.35) !important;
+      border-color: #f1c40f;
+      box-shadow: 0 0 25px rgba(241, 196, 15, 0.5);
+      transform: scale(1.08);
+    }
+
+    body.light-theme .cell.highlight {
+      background: rgba(255, 223, 0, 0.45) !important;
+    }
+
+    .status {
+      margin: 15px 0;
+      font-size: 1.4em;
+      font-weight: 600;
+      color: #e0e0e0;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+      transition: all 0.8s ease;
+    }
+
+    body.light-theme .status {
+      color: #333;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .scores {
+      margin: 15px 0;
+      font-size: 1.15em;
+      color: rgba(224, 224, 224, 0.95);
+      transition: all 0.8s ease;
+    }
+
+    body.light-theme .scores {
+      color: rgba(51, 51, 51, 0.95);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Тема переключатель */
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    body.light-theme .theme-toggle {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-6px) scale(1.1);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .theme-toggle:active {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Анимация переключения темы */
+    @keyframes themeSwitch {
+      0% { transform: translateY(-6px) scale(1.1) rotate(0deg); }
+      50% { transform: translateY(-10px) scale(1.2) rotate(180deg); }
+      100% { transform: translateY(-6px) scale(1.1) rotate(360deg); }
+    }
+
+    .theme-toggle.switching {
+      animation: themeSwitch 0.8s ease;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle">☀️</button>
+  
+  <div class="container">
+    <h1>🎮 Крестики-нолики</h1>
+
+    <!-- Меню -->
+    <div id="start-screen">
+      <button onclick="selectMode('ai')">С ИИ</button>
+      <button onclick="selectMode('local')">С другом</button>
+      <button onclick="selectMode('online')">По сети (в разработке)</button>
+    </div>
+
+    <!-- Выбор сложности ИИ -->
+    <div id="ai-settings" class="hidden">
+      <h2 style="color: #e0e0e0; margin: 20px 0;">Выберите сложность:</h2>
+      <button onclick="startGame('ai', 'easy')">Лёгкий</button>
+      <button onclick="startGame('ai', 'medium')">Средний</button>
+      <button onclick="startGame('ai', 'hard')">Сложный</button>
+      <button onclick="startGame('ai', 'impossible')">Невозможный</button>
+      <button onclick="goBack()" class="success">Назад</button>
+    </div>
+
+    <!-- Онлайн: создание/вход -->
+    <div id="online-screen" class="hidden">
+      <h2 style="color: #e0e0e0;">Игра по сети</h2>
+      <button onclick="createRoom()">Создать комнату</button>
+      <p style="color: #bbb; margin: 10px 0;">или</p>
+      <input type="text" id="roomIdInput" placeholder="Введите ID комнаты" />
+      <button onclick="joinRoom()">Присоединиться</button>
+      <p id="roomCodeDisplay" style="color: #f1c40f; font-weight: bold; margin: 10px 0; display: none;"></p>
+      <button onclick="goBack()" class="success">Назад</button>
+    </div>
+
+    <!-- Игровое поле -->
+    <div id="game-screen" class="hidden">
+      <div class="status" id="status">Ходит: X</div>
+      <div class="scores" id="scores">Счёт: X - 0 | O - 0</div>
+      <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+      </div>
+      <button onclick="resetGame()" class="danger">Новая игра</button>
+      <button onclick="goBack()" class="success">В меню</button>
+    </div>
+  </div>
+
+  <!-- Подключение к серверу -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    const socket = io("http://localhost:3000");
+
+    // Глобальные переменные
+    let board = Array(9).fill('');
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let gameMode = '';
+    let aiLevel = '';
+    let scores = { X: 0, O: 0 };
+    let roomId = null;
+    let isMyTurn = false;
+    let lastWinner = null;
+
+    const winningPatterns = [
+      [0,1,2], [3,4,5], [6,7,8],
+      [0,3,6], [1,4,7], [2,5,8],
+      [0,4,8], [2,4,6]
+    ];
+
+    const statusDisplay = document.getElementById('status');
+    const scoresDisplay = document.getElementById('scores');
+    const cells = document.querySelectorAll('.cell');
+    const roomIdInput = document.getElementById('roomIdInput');
+    const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+    const themeToggle = document.getElementById('themeToggle');
+
+    // --- Переключение темы ---
+    let isDarkTheme = false;
+    
+    themeToggle.addEventListener('click', () => {
+      themeToggle.classList.add('switching');
+      
+      setTimeout(() => {
+        isDarkTheme = !isDarkTheme;
+        if (isDarkTheme) {
+          document.body.classList.remove('light-theme');
+          themeToggle.textContent = '☀️';
+        } else {
+          document.body.classList.add('light-theme');
+          themeToggle.textContent = '🌙';
+        }
+        
+        themeToggle.classList.remove('switching');
+      }, 400);
+    });
+
+    // --- Управление экранами ---
+    function selectMode(mode) {
+      if (mode === 'ai') {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('ai-settings').classList.remove('hidden');
+      } else if (mode === 'local') {
+        startGame('local');
+      } else if (mode === 'online') {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('online-screen').classList.remove('hidden');
+      }
+    }
+
+    function createRoom() {
+      socket.emit('createRoom');
+    }
+
+    function joinRoom() {
+      const code = roomIdInput.value.trim();
+      if (code) {
+        socket.emit('joinRoom', code);
+      }
+    }
+
+    function startGame(mode, level = null) {
+      gameMode = mode;
+      aiLevel = level;
+      hideAllScreens();
+      document.getElementById('game-screen').classList.remove('hidden');
+      resetGame();
+    }
+
+    function goBack() {
+      if (roomId) {
+        socket.emit('leaveRoom', roomId);
+        roomId = null;
+      }
+      hideAllScreens();
+      document.getElementById('start-screen').classList.remove('hidden');
+      resetScores();
+    }
+
+    function hideAllScreens() {
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('ai-settings').classList.add('hidden');
+      document.getElementById('online-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.add('hidden');
+    }
+
+    function resetScores() {
+      scores = { X: 0, O: 0 };
+      updateScores();
+    }
+
+    // --- Сетевые события ---
+    socket.on('roomCreated', (code) => {
+      roomId = code;
+      roomCodeDisplay.textContent = `Код комнаты: ${code}`;
+      roomCodeDisplay.style.display = 'block';
+      alert(`Комната создана! Код: ${code}`);
+      socket.emit('joinRoom', code);
+    });
+
+    socket.on('joined', (player) => {
+      gameMode = 'online';
+      currentPlayer = player;
+      isMyTurn = (player === 'X');
+      hideAllScreens();
+      document.getElementById('game-screen').classList.remove('hidden');
+      resetGame();
+      statusDisplay.textContent = `Вы — ${currentPlayer}. ${isMyTurn ? 'Ваш ход.' : 'Ждём соперника.'}`;
+    });
+
+    socket.on('playerJoined', () => {
+      statusDisplay.textContent = `Соперник присоединился!`;
+      if (currentPlayer === 'O') {
+        isMyTurn = true;
+        statusDisplay.textContent = `Вы — O. Ваш ход.`;
+      }
+    });
+
+    socket.on('move', (index, player) => {
+      if (board[index] === '') {
+        board[index] = player;
+        cells[index].textContent = player;
+        cells[index].classList.add(player.toLowerCase());
+        
+        // Передача хода
+        isMyTurn = (currentPlayer !== player);
+        statusDisplay.textContent = isMyTurn ? `Ваш ход.` : `Ход соперника...`;
+      }
+    });
+
+    socket.on('gameOver', (data) => {
+      if (data.winner) {
+        statusDisplay.textContent = `Игрок ${data.winner} победил!`;
+        highlightWin(data.winPattern);
+        lastWinner = data.winner;
+      } else {
+        statusDisplay.textContent = 'Ничья!';
+        lastWinner = null;
+      }
+      gameActive = false;
+      scores = data.scores;
+      updateScores();
+    });
+
+    socket.on('resetGame', () => {
+      resetGameForNetwork();
+    });
+
+    socket.on('opponentDisconnected', () => {
+      alert("Соперник покинул игру.");
+      goBack();
+    });
+
+    // --- Логика игры ---
+    function resetGame() {
+      board = Array(9).fill('');
+      gameActive = true;
+      
+      if (gameMode === 'online') {
+        const firstPlayer = lastWinner === 'X' ? 'O' : (lastWinner === 'O' ? 'X' : 'X');
+        isMyTurn = (currentPlayer === firstPlayer);
+        statusDisplay.textContent = isMyTurn ? `Ваш ход.` : `Ход соперника...`;
+      } else {
+        currentPlayer = 'X';
+        statusDisplay.textContent = `Ходит: X`;
+      }
+      
+      updateScores();
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('x', 'o', 'highlight');
+      });
+    }
+
+    function resetGameForNetwork() {
+      board = Array(9).fill('');
+      gameActive = true;
+      
+      const firstPlayer = lastWinner === 'X' ? 'O' : (lastWinner === 'O' ? 'X' : 'X');
+      isMyTurn = (currentPlayer === firstPlayer);
+      statusDisplay.textContent = isMyTurn ? `Ваш ход.` : `Ход соперника...`;
+      
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('x', 'o', 'highlight');
+      });
+    }
+
+    function updateScores() {
+      scoresDisplay.textContent = `Счёт: X - ${scores.X} | O - ${scores.O}`;
+    }
+
+    function highlightWin(pattern) {
+      pattern.forEach(i => cells[i].classList.add('highlight'));
+    }
+
+    function checkWin() {
+      for (let pattern of winningPatterns) {
+        const [a, b, c] = pattern;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          return pattern;
+        }
+      }
+      return false;
+    }
+
+    function handleCellClick(index) {
+      if (!gameActive || board[index] !== '') return;
+
+      if (gameMode === 'local') {
+        board[index] = currentPlayer;
+        cells[index].textContent = currentPlayer;
+        cells[index].classList.add(currentPlayer.toLowerCase());
+
+        const win = checkWin();
+        if (win) {
+          statusDisplay.textContent = `Игрок ${currentPlayer} победил!`;
+          highlightWin(win);
+          scores[currentPlayer]++;
+          updateScores();
+          gameActive = false;
+          return;
+        }
+
+        if (board.every(c => c !== '')) {
+          statusDisplay.textContent = 'Ничья!';
+          gameActive = false;
+          return;
+        }
+
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        statusDisplay.textContent = `Ходит: ${currentPlayer}`;
+      }
+
+      // Сетевая игра
+      if (gameMode === 'online') {
+        if (isMyTurn && board[index] === '') {
+          socket.emit('move', roomId, index);
+        }
+        return;
+      }
+
+      // ИИ
+      if (gameMode === 'ai' && currentPlayer === 'X') {
+        board[index] = 'X';
+        cells[index].textContent = 'X';
+        cells[index].classList.add('x');
+
+        const win = checkWin();
+        if (win) {
+          statusDisplay.textContent = `Игрок X победил!`;
+          highlightWin(win);
+          scores.X++;
+          updateScores();
+          gameActive = false;
+          return;
+        }
+
+        if (board.every(c => c !== '')) {
+          statusDisplay.textContent = 'Ничья!';
+          gameActive = false;
+          return;
+        }
+
+        currentPlayer = 'O';
+        statusDisplay.textContent = `Ход ИИ...`;
+        setTimeout(aiMove, 600);
+      }
+    }
+
+    // --- ИИ ---
+    function aiMove() {
+      if (!gameActive) return;
+      let index;
+
+      switch (aiLevel) {
+        case 'easy':
+          index = getRandomMove();
+          break;
+        case 'medium':
+          index = Math.random() < 0.5 ? getWinningOrBlockingMove() : getRandomMove();
+          break;
+        default:
+          index = getBestMove();
+      }
+
+      board[index] = 'O';
+      cells[index].textContent = 'O';
+      cells[index].classList.add('o');
+
+      const win = checkWin();
+      if (win) {
+        statusDisplay.textContent = `ИИ победил!`;
+        highlightWin(win);
+        scores.O++;
+        updateScores();
+        gameActive = false;
+        return;
+      }
+
+      if (board.every(c => c !== '')) {
+        statusDisplay.textContent = 'Ничья!';
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = 'X';
+      statusDisplay.textContent = `Ваш ход.`;
+    }
+
+    function getRandomMove() {
+      const available = board.map((c, i) => c === '' ? i : null).filter(i => i !== null);
+      return available[Math.floor(Math.random() * available.length)];
+    }
+
+    function getWinningOrBlockingMove() {
+      const win = findMoveFor('O');
+      if (win !== -1) return win;
+      const block = findMoveFor('X');
+      if (block !== -1) return block;
+      return getRandomMove();
+    }
+
+    function findMoveFor(player) {
+      for (let i = 0; i < 9; i++) {
+        if (board[i] === '') {
+          board[i] = player;
+          if (checkWin()) {
+            board[i] = '';
+            return i;
+          }
+          board[i] = '';
+        }
+      }
+      return -1;
+    }
+
+    function getBestMove() {
+      let bestScore = -Infinity;
+      let bestMove;
+      for (let i = 0; i < 9; i++) {
+        if (board[i] === '') {
+          board[i] = 'O';
+          let score = minimax(board, 0, false);
+          board[i] = '';
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = i;
+          }
+        }
+      }
+      return bestMove;
+    }
+
+    function minimax(board, depth, isMaximizing) {
+      const winner = checkWin();
+      if (winner) return isMaximizing ? -10 + depth : 10 - depth;
+      if (board.every(c => c !== '')) return 0;
+
+      if (isMaximizing) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (board[i] === '') {
+            board[i] = 'O';
+            bestScore = Math.max(bestScore, minimax(board, depth + 1, false));
+            board[i] = '';
+          }
+        }
+        return bestScore;
+      } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (board[i] === '') {
+            board[i] = 'X';
+            bestScore = Math.min(bestScore, minimax(board, depth + 1, true));
+            board[i] = '';
+          }
+        }
+        return bestScore;
+      }
+    }
+
+    // --- Обработчики кликов ---
+    cells.forEach(cell => {
+      cell.addEventListener('click', () => {
+        const index = parseInt(cell.getAttribute('data-index'));
+        handleCellClick(index);
+      });
+    });
+  </script>
+</body>
+</html>
